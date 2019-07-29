@@ -17,6 +17,7 @@ int main() {
     int max = 0;
     map<string, int> personToScore;
     string persons[numberOfPeople];
+    string scorePersons[numberOfPeople];
 
     for (int p = 0; p < numberOfPeople; p++) {
       string line;
@@ -45,13 +46,14 @@ int main() {
       while (to_string(personToScore[person]).length() < max) {
         personToScore[person] = personToScore[person] * 10 + 2;
       }
+      scorePersons[i] = to_string((int) (pow(10, max) - personToScore[person])) + person;
     }
 
-    sort(persons, persons + numberOfPeople);
+    sort(scorePersons, scorePersons + numberOfPeople);
 
     for (int i = 0; i < numberOfPeople; i++) {
       
-      cout << persons[i] << endl;
+      cout << scorePersons[i].substr(max, scorePersons[i].length()) << endl;
     }
     cout << "==============================" << endl;
   }
