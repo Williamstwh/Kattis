@@ -19,32 +19,32 @@ class Frog {
     int height;
 };
 
-vector<Frog> frogs;
-
-int numberThatCanJump(int frogIndex, int wellHeight, int weightLimit,
+int numberThatCanJump(vector<Frog> frogs, int wellHeight, int weightLimit,
                       int numberOfFrogsSaved, int *maxSoFar) {
-  if (frogIndex == 0 || weightLimit <= 0) {
+  int numOfFrogs = frogs.size();
+  if (numOfFrogs == 0 || weightLimit <= 0) {
     *maxSoFar = max(*maxSoFar, numberOfFrogsSaved);
     return numberOfFrogsSaved;
   } else if (wellHeight <= 0) {
     *maxSoFar = max(*maxSoFar, numberOfFrogsSaved);
-    return frogIndex + numberOfFrogsSaved;
-  } else if (frogIndex + numberOfFrogsSaved < *maxSoFar) {
+    return numOfFrogs + numberOfFrogsSaved;
+  } else if (frogs.size() + numberOfFrogsSaved < *maxSoFar) {
     return INT_MIN;
   } else {
     // Get the heaviest frog
-    Frog heaviest = frogs[frogIndex];
+    Frog heaviest = frogs.back();
+    frogs.pop_back();
     int heaviestCanBeSaved = (heaviest.leap > wellHeight);
     vector<Frog> copy(frogs);
     // The heaviest frog used as a base
-    int option1 = numberThatCanJump(frogIndex - 1,
+    int option1 = numberThatCanJump(frogs,
                                     wellHeight - heaviest.height,
                                     min(weightLimit - heaviest.weight,
                                         heaviest.weight),
                                     numberOfFrogsSaved + heaviestCanBeSaved,
                                     maxSoFar);
     // The heaviest frog not used as a base
-    int option2 = numberThatCanJump(frogIndex - 1,
+    int option2 = numberThatCanJump(copy,
                                     wellHeight,
                                     weightLimit,
                                     numberOfFrogsSaved + heaviestCanBeSaved,
@@ -56,8 +56,7 @@ int numberThatCanJump(int frogIndex, int wellHeight, int weightLimit,
 int main() {
   int n, d;
   cin >> n >> d;
-  Frog df(0, 0, 0);
-  frogs.push_back(df);
+  vector<Frog> frogs;
 
   for (int i = 0; i < n; i++) {
     int l, w, h;
@@ -69,5 +68,5 @@ int main() {
   sort(frogs.begin(), frogs.end());
 
   int maxSoFar = 0;
-  cout << numberThatCanJump(n, d, INT_MAX, 0, &maxSoFar) << endl;
+  cout << numberThatCanJump(frogs, d, INT_MAX, 0, &maxSoFar) << endl;
 }
