@@ -2,7 +2,8 @@
 #include <vector>
 #include <algorithm>
 #include <cmath>
-#include <climits>
+#include <string>
+#include <unordered_map>
 using namespace std;
 
 class Frog {
@@ -20,36 +21,43 @@ class Frog {
 };
 
 vector<Frog> frogs;
+int *height;
+int *weight;
+unordered_map<string, int> map;
+int maxSoFar;
 
-int numberThatCanJump(int frogIndex, int wellHeight, int weightLimit,
-                      int numberOfFrogsSaved, int *maxSoFar) {
-  if (frogIndex == 0 || weightLimit <= 0) {
-    *maxSoFar = max(*maxSoFar, numberOfFrogsSaved);
-    return numberOfFrogsSaved;
-  } else if (wellHeight <= 0) {
-    *maxSoFar = max(*maxSoFar, numberOfFrogsSaved);
-    return frogIndex + numberOfFrogsSaved;
-  } else if (frogIndex + numberOfFrogsSaved < *maxSoFar) {
-    return INT_MIN;
+int numberThatCanJump(int frogIndex, int wellHeight, int weightLimit, int jumpedSoFar) {
+  // If there are no frogs left
+  if (frogIndex == 0) {
+    // Set maxSoFar to the max of maxSoFar and jumpedSoFar
+    maxSoFar = max(maxSoFar, jumpedSoFar);
+    return jumpedSoFar;
+  // If the total number of frogs that can pass if less than the max so far
+  } else if (jumpedSoFar + frogIndex < maxSoFar) {
+    return INT32_MIN;
+  // If the wellHeight is greater than ones we've seen before and the weightLimit is lower
+  } else if (wellHeight == height[frogIndex] && weightLimit == weight[frogIndex]) {
+    return map[to_string(frogIndex) + ":" + to_string(wellHeight) + ":" + to_string(weightLimit)];
+  } else if (wellHeight >= height[frogIndex] && weightLimit <= weight[frogIndex]) {
+    return INT32_MIN;
   } else {
-    // Get the heaviest frog
-    Frog heaviest = frogs[frogIndex];
-    int heaviestCanBeSaved = (heaviest.leap > wellHeight);
-    vector<Frog> copy(frogs);
-    // The heaviest frog used as a base
-    int option1 = numberThatCanJump(frogIndex - 1,
-                                    wellHeight - heaviest.height,
-                                    min(weightLimit - heaviest.weight,
-                                        heaviest.weight),
-                                    numberOfFrogsSaved + heaviestCanBeSaved,
-                                    maxSoFar);
-    // The heaviest frog not used as a base
-    int option2 = numberThatCanJump(frogIndex - 1,
-                                    wellHeight,
-                                    weightLimit,
-                                    numberOfFrogsSaved + heaviestCanBeSaved,
-                                    maxSoFar);
-    return max(option1, option2);
+    Frog frog = frogs[frogIndex];
+    int newJumpedSoFar = jumpedSoFar + (frog.leap > wellHeight);
+    int maxNumberJumped = max(
+      numberThatCanJump(frogIndex - 1, wellHeight, weightLimit, newJumpedSoFar),
+      numberThatCanJump(
+        frogIndex - 1,
+        wellHeight - frog.height,
+        min(frog.weight, weightLimit - frog.weight),
+        newJumpedSoFar)
+    );
+    if (wellHeight <= height[frogIndex] && weightLimit >= weight[frogIndex]) {
+      height[frogIndex] = wellHeight;
+      weight[frogIndex] = weightLimit;
+    }
+    maxSoFar = max(maxSoFar, maxNumberJumped);
+    map[to_string(frogIndex) + ":" + to_string(wellHeight) + ":" + to_string(weightLimit)] = maxNumberJumped;
+    return maxNumberJumped;
   }
 }
 
@@ -69,5 +77,9 @@ int main() {
   sort(frogs.begin(), frogs.end());
 
   int maxSoFar = 0;
-  cout << numberThatCanJump(n, d, INT_MAX, 0, &maxSoFar) << endl;
+  height = new int[n + 1];
+  weight = new int[n + 1];
+  fill_n(height, n + 1, INT32_MAX);
+  fill_n(weight, n + 1, INT32_MIN);
+  cout << numberThatCanJump(n, d, INT32_MAX, 0) << endl;
 }
