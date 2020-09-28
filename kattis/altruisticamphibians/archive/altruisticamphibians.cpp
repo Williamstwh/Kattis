@@ -1,72 +1,49 @@
-#include <iostream>
-#include <vector>
-#include <algorithm>
-#include <cmath>
-#include <climits>
+#include <bits/stdc++.h>
 using namespace std;
 
-class Frog {
-  public:
-    Frog(int l, int w, int h):
-    leap(l), weight(w), height(h) {}
+using ll = long long;
 
-    bool operator<(Frog other) const {
-      return weight < other.weight;
-    }
-
-    int leap;
-    int weight;
-    int height;
+struct Frog {
+    int l;
+    int w;
+    int h;
 };
 
-int numberThatCanJump(vector<Frog> frogs, int wellHeight, int weightLimit,
-                      int numberOfFrogsSaved, int *maxSoFar) {
-  int numOfFrogs = frogs.size();
-  if (numOfFrogs == 0 || weightLimit <= 0) {
-    *maxSoFar = max(*maxSoFar, numberOfFrogsSaved);
-    return numberOfFrogsSaved;
-  } else if (wellHeight <= 0) {
-    *maxSoFar = max(*maxSoFar, numberOfFrogsSaved);
-    return numOfFrogs + numberOfFrogsSaved;
-  } else if (frogs.size() + numberOfFrogsSaved < *maxSoFar) {
-    return INT_MIN;
-  } else {
-    // Get the heaviest frog
-    Frog heaviest = frogs.back();
-    frogs.pop_back();
-    int heaviestCanBeSaved = (heaviest.leap > wellHeight);
-    vector<Frog> copy(frogs);
-    // The heaviest frog used as a base
-    int option1 = numberThatCanJump(frogs,
-                                    wellHeight - heaviest.height,
-                                    min(weightLimit - heaviest.weight,
-                                        heaviest.weight),
-                                    numberOfFrogsSaved + heaviestCanBeSaved,
-                                    maxSoFar);
-    // The heaviest frog not used as a base
-    int option2 = numberThatCanJump(copy,
-                                    wellHeight,
-                                    weightLimit,
-                                    numberOfFrogsSaved + heaviestCanBeSaved,
-                                    maxSoFar);
-    return max(option1, option2);
-  }
+const int W = 2e8 + 5;
+
+int n, d;
+
+vector<Frog> frogs;
+int height[W];
+
+int solve() {
+    memset(height, 0, sizeof(height));
+
+    cin >> n >> d;
+
+    for (int i = 0; i < n; i++) {
+        int l, w, h;
+        cin >> l >> w >> h;
+        frogs.push_back(Frog{ l, w, h });
+    }
+
+    sort(frogs.begin(), frogs.end(), [](const Frog& a, const Frog& b) {
+        return a.w > b.w;
+    });
+
+    int count = 0;
+    for (const Frog& frog: frogs) {
+        if (frog.l + height[frog.w] > d) count++;
+        int mx = min((int) 1e8 - frog.w, frog.w);
+
+        for (int w = 1; w <= mx; w++) {
+            height[w] = max(height[w], height[frog.w + w] + frog.h);
+            if (height[w] > 1e8 + 5) height[w] = 1e8 + 5;
+        }
+    }
+    return count;
 }
 
 int main() {
-  int n, d;
-  cin >> n >> d;
-  vector<Frog> frogs;
-
-  for (int i = 0; i < n; i++) {
-    int l, w, h;
-    cin >> l >> w >> h;
-    Frog f(l, w, h);
-    frogs.push_back(f);
-  }
-
-  sort(frogs.begin(), frogs.end());
-
-  int maxSoFar = 0;
-  cout << numberThatCanJump(frogs, d, INT_MAX, 0, &maxSoFar) << endl;
+    cout << solve() << '\n';
 }

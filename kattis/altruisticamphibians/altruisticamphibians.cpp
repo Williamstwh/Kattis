@@ -1,85 +1,49 @@
-#include <iostream>
-#include <vector>
-#include <algorithm>
-#include <cmath>
-#include <string>
-#include <unordered_map>
+#include <bits/stdc++.h>
+
 using namespace std;
+#define ll long long
+#define ull unsigned long long
+#define mst(a, b) memset((a),(b),sizeof(a ))
+#define mp(a, b) make_pair(a,b)
+#define pi acos(-1)
+#define pii pair<int,int>
+#define pb push_back
+const int INF = 0x3f3f3f3f;
+const double eps = 1e-6;
+const int MAXN = 1e5 + 10;
+const int MAXM = 1e8 + 10;
+const ll mod = 1e9 + 7;
 
-class Frog {
-  public:
-    Frog(int l, int w, int h):
-    leap(l), weight(w), height(h) {}
+struct node {
+    int l, w, h;
+} a[MAXN];
 
-    bool operator<(Frog other) const {
-      return weight < other.weight;
-    }
-
-    int leap;
-    int weight;
-    int height;
-};
-
-vector<Frog> frogs;
-int *height;
-int *weight;
-unordered_map<string, int> map;
-int maxSoFar;
-
-int numberThatCanJump(int frogIndex, int wellHeight, int weightLimit, int jumpedSoFar) {
-  // If there are no frogs left
-  if (frogIndex == 0) {
-    // Set maxSoFar to the max of maxSoFar and jumpedSoFar
-    maxSoFar = max(maxSoFar, jumpedSoFar);
-    return jumpedSoFar;
-  // If the total number of frogs that can pass if less than the max so far
-  } else if (jumpedSoFar + frogIndex < maxSoFar) {
-    return INT32_MIN;
-  // If the wellHeight is greater than ones we've seen before and the weightLimit is lower
-  } else if (wellHeight == height[frogIndex] && weightLimit == weight[frogIndex]) {
-    return map[to_string(frogIndex) + ":" + to_string(wellHeight) + ":" + to_string(weightLimit)];
-  } else if (wellHeight >= height[frogIndex] && weightLimit <= weight[frogIndex]) {
-    return INT32_MIN;
-  } else {
-    Frog frog = frogs[frogIndex];
-    int newJumpedSoFar = jumpedSoFar + (frog.leap > wellHeight);
-    int maxNumberJumped = max(
-      numberThatCanJump(frogIndex - 1, wellHeight, weightLimit, newJumpedSoFar),
-      numberThatCanJump(
-        frogIndex - 1,
-        wellHeight - frog.height,
-        min(frog.weight, weightLimit - frog.weight),
-        newJumpedSoFar)
-    );
-    if (wellHeight <= height[frogIndex] && weightLimit >= weight[frogIndex]) {
-      height[frogIndex] = wellHeight;
-      weight[frogIndex] = weightLimit;
-    }
-    maxSoFar = max(maxSoFar, maxNumberJumped);
-    map[to_string(frogIndex) + ":" + to_string(wellHeight) + ":" + to_string(weightLimit)] = maxNumberJumped;
-    return maxNumberJumped;
-  }
+bool cmp(node x, node y) {
+    return x.w > y.w;
 }
 
+int dp[MAXM];
+
 int main() {
-  int n, d;
-  cin >> n >> d;
-  Frog df(0, 0, 0);
-  frogs.push_back(df);
-
-  for (int i = 0; i < n; i++) {
-    int l, w, h;
-    cin >> l >> w >> h;
-    Frog f(l, w, h);
-    frogs.push_back(f);
-  }
-
-  sort(frogs.begin(), frogs.end());
-
-  int maxSoFar = 0;
-  height = new int[n + 1];
-  weight = new int[n + 1];
-  fill_n(height, n + 1, INT32_MAX);
-  fill_n(weight, n + 1, INT32_MIN);
-  cout << numberThatCanJump(n, d, INT32_MAX, 0) << endl;
+#ifdef local
+    freopen( "data.txt " , " r " , stdin);
+//     freopen("data.txt", "w", stdout);
+#endif
+    mst(dp, 0);
+    int n, d;
+    scanf(" %d%d ", &n, &d);
+    for (int i = 0; i < n; i++)
+        scanf(" %d%d%d ", &a[i].l, &a[i].w, &a[i].h);
+    sort(a, a + n, cmp);
+    int ans = 0;
+    for (int i = 0; i < n; i++) {
+        if (dp[a[i].w] + a[i].l > d) ans++;
+        int mx = min((int) 1e8 - a[i].w, a[i].w);
+        for (int j = 1; j < mx; j++) {
+            dp[j] = max(dp[j], dp[j + a[i].w] + a[i].h);
+            if (dp[j] > MAXM) dp[j] = MAXM;
+        }
+    }
+    printf(" %d\n", ans);
+    return 0;
 }
