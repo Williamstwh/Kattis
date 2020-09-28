@@ -17,6 +17,9 @@ void solve() {
 }
 
 int main() {
+#ifdef READ_STDIN_FROM_FILE
+    freopen("1.in", "r", stdin);
+#endif
     IOSBASE;
     solve();
     return 0;

@@ -1,7 +1,7 @@
 MAKEFLAGS += -s
 
 # If the first argument is "run"...
-ifeq (run,$(firstword $(MAKECMDGOALS)))
+ifneq (,$(filter $(firstword $(MAKECMDGOALS)),run))
   # use the rest as arguments for "run"
   RUN_ARGS := $(wordlist 2,$(words $(MAKECMDGOALS)),$(MAKECMDGOALS))
   # ...and turn them into do-nothing targets
@@ -14,8 +14,8 @@ CC := /usr/local/bin/g++-10
 # C++ version
 CPPVERSION := 11
 
-# Folders to include
-FOLDERS := kattis kickstart leetcode
+# Sources to include
+SOURCES := kattis kickstart leetcode
 
 .PHONY: run cmake
 
@@ -37,9 +37,14 @@ cmake:
 	@echo 'set(CMAKE_CXX_STANDARD $(CPPVERSION))' >> CMakeLists.txt
 	@echo 'set(CMAKE_CXX_COMPILER $(CC))' >> CMakeLists.txt
 	@echo >> CMakeLists.txt
-	@for i in $(FOLDERS); do \
-		for j in $$(find $$i -type f -name "*.cpp"); do \
-			k=$$(echo $$j | sed -e "s/\//\-/g; s/\.cpp//"); \
-			echo "add_executable($$k $$j)" >> CMakeLists.txt; \
+	@echo 'set(GCC_COVERAGE_COMPILE_FLAGS "-DREAD_STDIN_FROM_FILE")' >> CMakeLists.txt
+	@echo 'add_definitions($${GCC_COVERAGE_COMPILE_FLAGS})' >> CMakeLists.txt
+	@echo >> CMakeLists.txt
+	@for source in $(SOURCES); do \
+		for file in $$(find $$source -type f -name "*.cpp"); do \
+			folder=$$(echo $$file | rev | cut -d '/' -f 2- | rev); \
+			executable="$$(echo $$file | sed -e "s/\//\-/g; s/\.cpp//").out"; \
+			echo "add_executable($$executable $$file)" >> CMakeLists.txt; \
+			echo "set_target_properties($$executable PROPERTIES RUNTIME_OUTPUT_DIRECTORY "'$${PROJECT_SOURCE_DIR}'"/$$folder)" >> CMakeLists.txt; \
 		done \
 	done
