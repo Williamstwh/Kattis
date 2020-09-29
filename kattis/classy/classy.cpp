@@ -1,60 +1,87 @@
-#include <iostream>
-#include <string>
-#include <sstream>
-#include <algorithm>
-#include <map>
-#include <cmath>
+#include <bits/stdc++.h>
+
 using namespace std;
+#define ll long long
+#define ull unsigned long long
+#define mst(a,b) memset((a),(b),sizeof(a))
+#define mp(a,b) make_pair(a,b)
+#define pi acos(-1)
+#define pii pair<int,int>
+#define pb push_back
+#define IOSBASE ios_base::sync_with_stdio(0); cin.tie(0); cout.tie(0);
+const int INF = 0x3f3f3f3f;
+const double eps = 1e-6;
+const ll mod = 1e9 + 7;
+
+
+int priority(string seq) {
+    vector<int> v;
+
+    stringstream ss(seq);
+    string token;
+    while (getline(ss, token, '-')) {
+        if (token == "upper") {
+            v.push_back(2);
+        } else if (token == "lower") {
+            v.push_back(0);
+        } else {
+            v.push_back(1);
+        }
+    }
+    reverse(v.begin(), v.end());
+    while (v.size() < 10) {
+        v.push_back(1);
+    }
+    reverse(v.begin(), v.end());
+
+    int priority = 0;
+    int f = 1;
+    for (int j = 0; j < 10; j++) {
+        priority += f * v[j];
+        f *= 3;
+    }
+    return priority;
+}
+
+struct Cmp {
+    bool operator() (const pair<int, string>& p1, const pair<int, string>& p2) const {
+        if (p1.first == p2.first) {
+            return p1.second < p2.second;
+        }
+
+        return p1.first > p2.first;
+    }
+};
+
+void solve() {
+    int t;
+    cin >> t;
+    while (t--) {
+        int n;
+        cin >> n;
+        set<pair<int, string>, Cmp> s;
+
+        while (n--) {
+            string person, seq, c;
+            cin >> person >> seq >> c;
+            person = person.substr(0, person.size() - 1);
+
+            s.insert(pair<int, string>{ priority(seq), person });
+        }
+
+        for (auto& p : s) {
+            cout << p.second << '\n';
+        }
+
+        cout << "==============================\n";
+    }
+}
 
 int main() {
-  int numberOfCases, numberOfPeople;
-  cin >> numberOfCases;
-  for (int c = 0; c < numberOfCases; c++) {
-    cin >> numberOfPeople;
-    string dummy;
-    getline(cin, dummy);
-
-    int max = 0;
-    map<string, int> personToScore;
-    string persons[numberOfPeople];
-    string scorePersons[numberOfPeople];
-
-    for (int p = 0; p < numberOfPeople; p++) {
-      string line;
-      getline(cin, line);
-      replace(line.begin(), line.end(), '-', ' ');
-      stringstream ss(line);
-
-      int base = 1;
-      int score = 0;
-      string word;
-      ss >> word;
-      string person = word.substr(0, word.length() - 1);
-      persons[p] = person;
-      while (word != "class") {
-        ss >> word;
-        score += (base * (word == "upper" ? 3 : word == "middle" ? 2 : word == "lower" ? 1 : 0));
-        base *= 10;
-      }
-      int localMax = to_string(score).length();
-      max = max > localMax ? max : localMax;
-      personToScore[person] = score;
-    }
-
-    for (int i = 0; i < numberOfPeople; i++) {
-      string person = persons[i];
-      while (to_string(personToScore[person]).length() < max) {
-        personToScore[person] = personToScore[person] * 10 + 2;
-      }
-      scorePersons[i] = to_string((int) (pow(10, max) - personToScore[person])) + person;
-    }
-
-    sort(scorePersons, scorePersons + numberOfPeople);
-
-    for (int i = 0; i < numberOfPeople; i++) {
-      
-      cout << scorePersons[i].substr(max, scorePersons[i].length()) << endl;
-    }
-    cout << "==============================" << endl;
-  }
+#ifdef READ_STDIN_FROM_FILE
+    freopen("1.in", "r", stdin);
+#endif
+    IOSBASE;
+    solve();
+    return 0;
 }
