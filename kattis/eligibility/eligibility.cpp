@@ -1,18 +1,47 @@
-#include <stdio.h>
-#include <string>
+#include <bits/stdc++.h>
+
+using namespace std;
+#define ll long long
+#define ull unsigned long long
+#define mst(a,b) memset((a),(b),sizeof(a))
+#define mp(a,b) make_pair(a,b)
+#define pi acos(-1)
+#define pii pair<int,int>
+#define pb push_back
+#define IOSBASE ios_base::sync_with_stdio(0); cin.tie(0); cout.tie(0);
+const int INF = 0x3f3f3f3f;
+const double eps = 1e-6;
+const ll mod = 1e9 + 7;
+
+void solve() {
+    int n;
+    cin >> n;
+
+    string name, sec, birth;
+    int courses;
+    while (n--) {
+        cin >> name >> sec >> birth >> courses;
+        int secyear = stoi(sec.substr(0, 4));
+        int birthyear = stoi(birth.substr(0, 4));
+
+        cout << name << ' ';
+
+        if (secyear >= 2010 || birthyear >= 1991) {
+            cout << "eligible";
+        } else if (courses >= 41) {
+            cout << "ineligible";
+        } else {
+            cout << "coach petitions";
+        }
+        cout << '\n';
+    }
+}
 
 int main() {
-  int n;
-  scanf("%d", &n);
-  while (n--) {
-    char *name;
-    int studyYear, studyMonth, studyDay;
-    int birthYear, birthMonth, birthDay;
-    int courses;
-    scanf("%s %d/%d/%d %d/%d/%d %d", name, &studyYear, &studyMonth, &studyDay, &birthYear, &birthMonth, &birthDay, &courses);
-    printf("%s %s",
-           name, 
-           studyYear >= 2010 || birthYear >= 1991 ? "eligible\n" :
-           courses > 40 ? "ineligible\n": "coach petitions\n");
-  }
+#ifdef READ_STDIN_FROM_FILE
+    freopen("1.in", "r", stdin);
+#endif
+    IOSBASE;
+    solve();
+    return 0;
 }
