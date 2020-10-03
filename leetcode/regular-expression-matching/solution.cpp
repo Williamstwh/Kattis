@@ -1,71 +1,32 @@
-#include <iostream>
-#include <vector>
+#ifdef INCLUDE_HEADERS
+#include <bits/stdc++.h>
 
 using namespace std;
 
+#endif
+
 class Solution {
 public:
-    bool isMatch(string s, string p) {
-        vector<vector<bool>> visited(s.size() + 1, vector<bool>(p.size() + 1, false));
-        vector<vector<bool>> matched(s.size() + 1, vector<bool>(p.size() + 1, false));
-        return isMatch(s, p, visited, matched);
+    bool dp(int i, int j, string s, string p) {
+        if (j >= p.size()) return i >= s.size();
+
+        bool firstMatch = i != s.size() && (s[0] == p[0] || p[0] == '.');
+
+        if (p.size() - j >= 2 && p[j + 1] == '*') {
+            return dp(i, j + 2, s, p) || (firstMatch && dp(i + 1, j, s, p));
+        }
+
+        return firstMatch && dp(i + 1, j + 1, s, p);
     }
 
-    bool isMatch(string s, string p, vector<vector<bool>> & v, vector<vector<bool>> & m) {
-        if (v[s.size()][p.size()]) {
-            return v[s.size()][p.size()];
-        }
-
-        if (p == "") {
-            return s.size() == 0;
-        }
-
-        if (p[0] == '.') {
-            if (p.size() == 1) {
-                return s.size() == 1;
-            }
-
-            if (p[1] == '*') {
-                if (p.size() == 2) {
-                    return true;
-                }
-
-                for (int i = 0; i < s.size(); i++) {
-                    if (isMatch(s.substr(i), p.substr(2), v, m)) {
-                        return true;
-                    }
-                }
-                return false;
-            }
-
-            return isMatch(s.substr(1), p.substr(1));
-        }
-
-        if (p.size() == 1) {
-            return s == p;
-        }
-
-        if (p[1] == '*') {
-            if (s == "" && p.size() == 2) {
-                return true;
-            }
-
-            if (s[0] == p[0]) {
-                return isMatch(s.substr(1), p, v, m);
-            }
-
-            return isMatch(s, p.substr(2), v, m);
-        }
-
-        if (s[0] == p[0]) {
-            return isMatch(s.substr(1), p.substr(1), v, m);
-        }
-
-        return false;
+    bool isMatch(string s, string p) {
+        return dp(0, 0, s, p);
     }
 };
 
+#ifdef INCLUDE_MAIN
 int main() {
     Solution s;
-    cout << (s.isMatch("aba", "a*a") ? "yes" : "no") << '\n';
+    cout << (s.isMatch("aba", "aca") ? "yes" : "no") << '\n';
 }
+#endif

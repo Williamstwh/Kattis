@@ -19,8 +19,10 @@ SOURCES := kattis kickstart leetcode
 
 .PHONY: run cmake
 
+RUN_HEADERS := -DREAD_STDIN_FROM_FILE -DINCLUDE_HEADERS -DINCLUDE_MAIN -DENABLE_DEBUG
+
 run:
-	@$(CC) $(RUN_ARGS)/*.cpp -o $(RUN_ARGS)/main.out;
+	@$(CC) $(RUN_ARGS)/*.cpp -o $(RUN_ARGS)/main.out $(RUN_HEADERS);
 	@for i in $(RUN_ARGS)/*.in; do \
   		echo; \
 		echo ===============================; \
@@ -37,7 +39,7 @@ cmake:
 	@echo 'set(CMAKE_CXX_STANDARD $(CPPVERSION))' >> CMakeLists.txt
 	@echo 'set(CMAKE_CXX_COMPILER $(CC))' >> CMakeLists.txt
 	@echo >> CMakeLists.txt
-	@echo 'set(GCC_COVERAGE_COMPILE_FLAGS "-DREAD_STDIN_FROM_FILE")' >> CMakeLists.txt
+	@echo 'set(GCC_COVERAGE_COMPILE_FLAGS "$(RUN_HEADERS)")' >> CMakeLists.txt
 	@echo 'add_definitions($${GCC_COVERAGE_COMPILE_FLAGS})' >> CMakeLists.txt
 	@echo >> CMakeLists.txt
 	@for source in $(SOURCES); do \
