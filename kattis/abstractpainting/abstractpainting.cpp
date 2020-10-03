@@ -26,7 +26,26 @@ const int INF = 0x3f3f3f3f;
 const double eps = 1e-6;
 const ll mod = 1e9 + 7;
 
+ull pw(ull d, int e) {
+    if (e == 0) return 1;
+
+    if (e % 2 == 0) return pw(d * d % mod, e / 2) % mod;
+
+    return d * pw(d, e - 1) % mod;
+}
+
+ull calc(int r, int c) {
+    return (pw(2, r * c) * pw(3, r + c)) % mod;
+}
+
 void solve() {
+    int n, r, c;
+    cin >> n;
+
+    for (int i = 0; i < n; i++) {
+        cin >> r >> c;
+        cout << calc(r, c) << '\n';
+    }
 }
 
 int main() {
@@ -37,3 +56,4 @@ int main() {
     solve();
     return 0;
 }
+
