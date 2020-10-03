@@ -1,53 +1,96 @@
-#include <cstdio>
- #include <cstdint>
- #include <limits>
-#include <algorithm>
-#include <cmath>
+#include <bits/stdc++.h>
+
 using namespace std;
+#define ll long long
+#define ull unsigned long long
+#define mst(a,b) memset((a),(b),sizeof(a))
+#define mp(a,b) make_pair(a,b)
+#define pi acos(-1)
+#define pii pair<int,int>
+#define pb push_back
+#define IOSBASE ios_base::sync_with_stdio(0); cin.tie(0); cout.tie(0);
+const int INF = 0x3f3f3f3f;
+const double eps = 1e-6;
+const ll mod = 1e9 + 7;
+
+void solve() {
+    int n, prev, t;
+    double a;
+
+    while (true) {
+        cin >> n;
+        if (n == 0) {
+            break;
+        }
+
+        vector<double> amount(1440, -0.08);
+
+        prev = 0;
+        for (int i = 0; i < n; i++) {
+            cin >> t >> a;
+            amount[t] += a;
+        }
+
+        double maxTotal = -INFINITY;
+        double total = -INFINITY;
+
+        vector<pair<double, pii>> v;
+
+        int start = 0;
+        int end = 0;
+        for (int i = 0; i < 1440; i++) {
+            double x = amount[i];
+            double y = total + x;
+
+
+            total = max(x, y);
+            if (total >= maxTotal) {
+                if (x > y) {
+                    start = i;
+                    end = i;
+                } else if (x < y) {
+                    end = i;
+                }
+                maxTotal = max(maxTotal, total);
+
+                v.push_back(pair<double, pii>{ maxTotal, pii{ start, end } });
+            }
+        }
+
+        sort(v.begin(), v.end(), [](const pair<double, pii>& a, const pair<double, pii>& b) {
+            if (a.first != b.first) {
+                return a.first > b.first;
+            }
+
+            const pii& ap = a.second;
+            int aDiff = ap.second - ap.first;
+
+            const pii& bp = b.second;
+            int bDiff = bp.second - bp.first;
+
+            if (aDiff < bDiff) {
+                return true;
+            } else if (aDiff > bDiff) {
+                return false;
+            }
+
+            return ap.first < bp.first;
+        });
+
+        if (maxTotal <= 0.0) {
+            cout << "no profit\n";
+        } else {
+            cout << fixed << setprecision(2);
+            cout << v[0].first << ' ' << v[0].second.first << ' ' << v[0].second.second << '\n';
+        }
+    }
+}
 
 int main() {
-  int N, t;
-  int profits[1440];
-  float p;
-
-  while (true) {
-    scanf("%d", &N);
-    if (N == 0) {
-      break;
-    }
-    fill(profits, profits + 1440, -8);
-    while (N--) {
-      scanf("%d %f", &t, &p);
-      profits[t] = ((int) (p * 100 + 0.5)) - 8;
-    }
-    int globalStart = 0;
-    int globalEnd = 0;
-    int localStart = 0;
-    int localEnd = 0;
-    int globalMax = INT32_MIN / 2, currentMax = INT32_MIN / 2;
-    int current, cumulative;
-    for (int i = 0; i < 1440; i++) {
-      current = profits[i];
-      cumulative = profits[i] + currentMax;
-      if (current > cumulative) {
-        localStart = i;
-        localEnd = i;
-        currentMax = current;
-      } else {
-        localEnd = i;
-        currentMax = cumulative;
-      };
-
-      if (currentMax > globalMax) {
-        globalStart = localStart;
-        globalEnd = localEnd;
-        globalMax = currentMax;
-      }
-    }
-    if (globalMax <= 0) {
-      printf("no profit\n");
-    } else {
-      printf("%.2f %d %d\n", ((float) globalMax) / 100, globalStart, globalEnd);
-    }
-  }
+#ifdef READ_STDIN_FROM_FILE
+    freopen("1.in", "r", stdin);
+#endif
+    IOSBASE;
+    solve();
+    return 0;
 }
