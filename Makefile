@@ -1,7 +1,7 @@
 MAKEFLAGS += -s
 
 # If the first argument is "run" or "new"...
-ifneq (,$(filter $(firstword $(MAKECMDGOALS)),run new))
+ifneq (,$(filter $(firstword $(MAKECMDGOALS)),run new reset))
   # use the rest as arguments for "run"
   RUN_ARGS := $(wordlist 2,$(words $(MAKECMDGOALS)),$(MAKECMDGOALS))
   # ...and turn them into do-nothing targets
@@ -17,7 +17,7 @@ CPPVERSION := 11
 # Sources to include
 SOURCES := kattis kickstart leetcode scratch
 
-.PHONY: run new cmake
+.PHONY: run new reset cmake
 
 RUN_HEADERS := -DREAD_STDIN_FROM_FILE -DINCLUDE_HEADERS -DINCLUDE_MAIN -DENABLE_DEBUG
 
@@ -35,17 +35,33 @@ run:
 new:
 	@if :; then \
 		trimmed_path=$$(echo $(RUN_ARGS) | sed 's/\/*$$//g'); \
-		echo $${trimmed_path}; \
 		base=$$(echo $$trimmed_path | cut -d "/" -f1); \
-		echo $$base; \
 		new_file="$$(echo $$trimmed_path | rev | cut -d '/' -f1 | rev).cpp"; \
-		echo $$new_file; \
 		if echo $$base | grep -Eq '^(leetcode)$$'; then \
 		  	new_file="solution.cpp"; \
 		fi; \
-		echo $$new_file; \
+		mkdir -p $$trimmed_path; \
+		cp -n $$base/template.cpp $$trimmed_path/$$new_file; \
+		for i in $$(seq 1 3); do \
+			touch $$trimmed_path/$$i.in; \
+		done; \
+	fi;
+	@make cmake;
+
+# Overrides existing files
+reset:
+	@if :; then \
+		trimmed_path=$$(echo $(RUN_ARGS) | sed 's/\/*$$//g'); \
+		base=$$(echo $$trimmed_path | cut -d "/" -f1); \
+		new_file="$$(echo $$trimmed_path | rev | cut -d '/' -f1 | rev).cpp"; \
+		if echo $$base | grep -Eq '^(leetcode)$$'; then \
+		  	new_file="solution.cpp"; \
+		fi; \
 		mkdir -p $$trimmed_path; \
 		cp $$base/template.cpp $$trimmed_path/$$new_file; \
+		for i in $$(seq 1 3); do \
+			touch $$trimmed_path/$$i.in; \
+		done; \
 	fi;
 	@make cmake;
 
