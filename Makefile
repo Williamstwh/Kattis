@@ -1,7 +1,7 @@
 MAKEFLAGS += -s
 
-# If the first argument is "run"...
-ifneq (,$(filter $(firstword $(MAKECMDGOALS)),run))
+# If the first argument is "run" or "new"...
+ifneq (,$(filter $(firstword $(MAKECMDGOALS)),run new))
   # use the rest as arguments for "run"
   RUN_ARGS := $(wordlist 2,$(words $(MAKECMDGOALS)),$(MAKECMDGOALS))
   # ...and turn them into do-nothing targets
@@ -17,7 +17,7 @@ CPPVERSION := 11
 # Sources to include
 SOURCES := kattis kickstart leetcode scratch
 
-.PHONY: run cmake
+.PHONY: run new cmake
 
 RUN_HEADERS := -DREAD_STDIN_FROM_FILE -DINCLUDE_HEADERS -DINCLUDE_MAIN -DENABLE_DEBUG
 
@@ -31,6 +31,23 @@ run:
 		$(RUN_ARGS)/main.out < $$i; \
 	done
 	@rm -rf $(RUN_ARGS)/main.out;
+
+new:
+	@if :; then \
+		trimmed_path=$$(echo $(RUN_ARGS) | sed 's/\/*$$//g'); \
+		echo $${trimmed_path}; \
+		base=$$(echo $$trimmed_path | cut -d "/" -f1); \
+		echo $$base; \
+		new_file="$$(echo $$trimmed_path | rev | cut -d '/' -f1 | rev).cpp"; \
+		echo $$new_file; \
+		if echo $$base | grep -Eq '^(leetcode)$$'; then \
+		  	new_file="solution.cpp"; \
+		fi; \
+		echo $$new_file; \
+		mkdir -p $$trimmed_path; \
+		cp $$base/template.cpp $$trimmed_path/$$new_file; \
+	fi;
+	@make cmake;
 
 cmake:
 	@echo 'cmake_minimum_required(VERSION 3.16)' > CMakeLists.txt
