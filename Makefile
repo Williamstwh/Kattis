@@ -15,7 +15,7 @@ CC := /usr/local/bin/g++-10
 CPPVERSION := 11
 
 # Sources to include
-SOURCES := kattis kickstart leetcode
+SOURCES := kattis kickstart leetcode scratch
 
 .PHONY: run cmake
 
