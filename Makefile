@@ -17,6 +17,9 @@ CPPVERSION := 11
 # Sources to include
 SOURCES := kattis kickstart leetcode scratch
 
+# Sources to use solution.cpp
+SOLUTIONCPP := kickstart leetcode
+
 .PHONY: run new reset cmake
 
 RUN_HEADERS := -DREAD_STDIN_FROM_FILE -DINCLUDE_HEADERS -DINCLUDE_MAIN -DENABLE_DEBUG
@@ -37,7 +40,8 @@ new:
 		trimmed_path=$$(echo $(RUN_ARGS) | sed 's/\/*$$//g'); \
 		base=$$(echo $$trimmed_path | cut -d "/" -f1); \
 		new_file="$$(echo $$trimmed_path | rev | cut -d '/' -f1 | rev).cpp"; \
-		if echo $$base | grep -Eq '^(leetcode)$$'; then \
+		solutioncpp=$$(echo $(SOLUTIONCPP) | sed 's/ /|/g'); \
+		if echo $$base | grep -Eq "^($$solutioncpp)$$"; then \
 		  	new_file="solution.cpp"; \
 		fi; \
 		mkdir -p $$trimmed_path; \
@@ -54,7 +58,8 @@ reset:
 		trimmed_path=$$(echo $(RUN_ARGS) | sed 's/\/*$$//g'); \
 		base=$$(echo $$trimmed_path | cut -d "/" -f1); \
 		new_file="$$(echo $$trimmed_path | rev | cut -d '/' -f1 | rev).cpp"; \
-		if echo $$base | grep -Eq '^(leetcode)$$'; then \
+		solutioncpp=$$(echo $(SOLUTIONCPP) | sed 's/ /|/g'); \
+		if echo $$base | grep -Eq "^($$solutioncpp)$$"; then \
 		  	new_file="solution.cpp"; \
 		fi; \
 		mkdir -p $$trimmed_path; \
