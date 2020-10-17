@@ -17,6 +17,8 @@ using namespace std;
 #define IOSBASE ios_base::sync_with_stdio(0); cin.tie(0); cout.tie(0);
 #define ll long long
 #define ull unsigned long long
+#define umap unordered_map
+#define uset unordered_set
 #define mst(a,b) memset((a),(b),sizeof(a))
 #define mp(a,b) make_pair(a,b)
 #define pi acos(-1)
