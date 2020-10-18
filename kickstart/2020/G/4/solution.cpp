@@ -28,7 +28,58 @@ const int INF = 0x3f3f3f3f;
 const double eps = 1e-6;
 const ll mod = 1e9 + 7;
 
+ull total;
+int c;
+
+vector<int> merge(vector<int> v, int i) {
+    int s = v[i] + v[i + 1];
+//    DE(cout << s << '\n');
+    total += s;
+    v[i] += v[i + 1];
+    v.erase(v.begin() + i + 1);
+    return v;
+}
+
+void pvector(vector<int> v) {
+    for (int i = 0; i < v.size(); i++) {
+        cout << v[i] << ' ';
+    }
+    cout << '\n';
+}
+
+void rec(vector<int> v) {
+    DE(pvector(v));
+    if (v.size() == 1) {
+        c++;
+        return;
+    }
+
+    for (int i = 0; i < v.size() - 1; i++) {
+        rec(merge(v, i));
+    }
+}
+
+int fact(int n) {
+    if (n <= 1) {
+        return 1;
+    }
+
+    return n * fact(n - 1);
+}
+
 void solve() {
+    int n;
+    cin >> n;
+
+    vector<int> v(n);
+    for (int i = 0; i < n; i++) {
+        cin >> v[i];
+    }
+
+    total = 0;
+    c = 0;
+    rec(v);
+    cout << setprecision(9) << fixed << (double) (total) / (double) (c);
 }
 
 int main() {
