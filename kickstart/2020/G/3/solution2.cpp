@@ -28,38 +28,7 @@ const int INF = 0x3f3f3f3f;
 const double eps = 1e-6;
 const ll mod = 1e9 + 7;
 
-const int N = 1e3 + 5;
-ll arr[N][N];
-
 void solve() {
-    int n;
-    cin >> n;
-
-    for (int i = 0; i < n; i++) {
-        for (int j = 0; j < n; j++) {
-            cin >> arr[i][j];
-        }
-    }
-
-    ll m = 0;
-
-    for (int i = 0; i < n; i++) {
-        ll s = 0;
-        for (int j = 0; i + j < n; j++) {
-            s += arr[j][i + j];
-        }
-        m = max(m, s);
-    }
-
-    for (int i = 0; i < n; i++) {
-        ll s = 0;
-        for (int j = 0; i + j < n; j++) {
-            s += arr[i + j][j];
-        }
-        m = max(m, s);
-    }
-
-    cout << m;
 }
 
 int main() {

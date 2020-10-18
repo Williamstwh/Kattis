@@ -28,7 +28,12 @@ const int INF = 0x3f3f3f3f;
 const double eps = 1e-6;
 const ll mod = 1e9 + 7;
 
+const int N = 1e9 + 5;
+
+int arr[N];
+
 void solve() {
+    int w, n;
 }
 
 int main() {
