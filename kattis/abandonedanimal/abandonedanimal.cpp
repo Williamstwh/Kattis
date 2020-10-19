@@ -17,6 +17,8 @@ using namespace std;
 #define IOSBASE ios_base::sync_with_stdio(0); cin.tie(0); cout.tie(0);
 #define ll long long
 #define ull unsigned long long
+#define umap unordered_map
+#define uset unordered_set
 #define mst(a,b) memset((a),(b),sizeof(a))
 #define mp(a,b) make_pair(a,b)
 #define pi acos(-1)
@@ -26,55 +28,99 @@ const int INF = 0x3f3f3f3f;
 const double eps = 1e-6;
 const ll mod = 1e9 + 7;
 
-int n, k, m;
-vector<unordered_set<string>> storeItems;
-vector<string> listItems;
-unordered_map<int, unordered_map<int, int>> stored;
+void solve() {
+    int n, k;
+    cin >> n >> k;
 
-int count() {
-    // Number of paths up to and including m
-    vector<int> paths(m + 1, 0);
+    // Set up data structures
+    umap<string, set<int>> itemStores;
+    vector<string> items;
 
-    for (auto& store : storeItems) {
-        if (store.find(listItems[0]) != store.end()) {
-            paths[0]++;
+    // Read in first half of data
+    for (int i = 0; i < k; i++) {
+        int store;
+        string item;
+        cin >> store >> item;
+        itemStores[item].insert(store);
+    }
+
+    // Keep track of input
+    vector<string> input;
+
+    int m;
+    cin >> m;
+    for (int i = 0; i < m; i++) {
+        string item;
+        cin >> item;
+        input.push_back(item);
+    }
+
+    // Get max from lo to hi
+    int lastVisitedStore = 0;
+
+    // For each item
+    for (int i = 0; i < m; i++) {
+        string item = input[i];
+        vector<int> rem;
+
+        // For each store that contains the item
+        for (int store : itemStores[item]) {
+            // If the store is before the last visited store, remove it
+            if (store < lastVisitedStore) {
+                rem.push_back(store);
+            }
+        }
+
+        for (int store : rem) {
+            itemStores[item].erase(store);
+        }
+
+        if (itemStores[item].size() > 0) {
+            // First store that contains the item
+            lastVisitedStore = max(*itemStores[item].begin(), lastVisitedStore);
         }
     }
 
-    return paths[m];
-}
+    // Get min from hi to low
+    lastVisitedStore = INF;
+    for (int i = m - 1; i >= 0; i--) {
+        string item = input[i];
+        vector<int> rem;
 
-void solve() {
-    int i;
-    string s, t;
+        for (int store : itemStores[item]) {
+            if (store > lastVisitedStore) {
+                rem.push_back(store);
+            }
+        }
 
-    cin >> n;
-    cin >> k;
+        for (int store : rem) {
+            itemStores[item].erase(store);
+        }
 
-    storeItems = vector<unordered_set<string>>(n, unordered_set<string>());
-
-    for (int j = 0; j < k; j++) {
-        cin >> i >> s;
-        storeItems[i].insert(s);
+        if (itemStores[item].size() > 0) {
+            lastVisitedStore = min(*itemStores[item].begin(), lastVisitedStore);
+        }
     }
 
-    cin >> m;
+    bool works = true;
+    bool ambig = false;
+    for (string item : input) {
+        if (itemStores[item].size() < 1) {
+            works = false;
+        }
 
-    for (int j = 0; j < m; j++) {
-        cin >> t;
-        listItems.push_back(t);
+        if (itemStores[item].size() > 1) {
+            ambig = true;
+        }
     }
 
-    int res = count();
-    DE(cout << res << '\n')
-    if (res == 0) {
-        cout << "impossible";
-    } else if (res == 1) {
-        cout << "unique";
+    if (!works) {
+        cout << "impossible" << '\n';
+    } else if (ambig) {
+        cout << "ambiguous" << '\n';
     } else {
-        cout << "ambiguous";
+        cout << "unique" << '\n';
     }
-    cout << '\n';
 }
 
 int main() {
@@ -82,7 +128,6 @@ int main() {
     freopen(INPUT, "r", stdin);
 #endif
     IOSBASE;
-    vector<int> v{1, 2, 3, 4};
     solve();
     return 0;
 }
