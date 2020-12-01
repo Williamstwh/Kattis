@@ -15,10 +15,10 @@ CC := /usr/local/bin/g++-10
 CPPVERSION := 11
 
 # Sources to include
-SOURCES := kattis kickstart leetcode scratch
+SOURCES := kattis kickstart leetcode scratch adventofcode
 
 # Sources to use solution.cpp
-SOLUTIONCPP := kickstart leetcode
+SOLUTIONCPP := kickstart leetcode adventofcode
 
 .PHONY: run new reset cmake
 
